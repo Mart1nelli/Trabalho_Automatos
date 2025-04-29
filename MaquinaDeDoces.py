@@ -101,7 +101,10 @@ while rodando:
                 saldo += 2
                 mensagem = "R$2 inserido."
             elif botao_5.collidepoint(event.pos):
-                saldo += 5
+                if isinstance(saldo, int) and saldo >= 0:
+                    saldo += 5
+                else:
+                    mensagem = "Erro: saldo inválido."
                 mensagem = "R$5 inserido."
             elif botao_a.collidepoint(event.pos):
                 if saldo >= precos["A"]:
