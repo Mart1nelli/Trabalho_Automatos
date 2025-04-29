@@ -2,6 +2,8 @@ import pygame
 import sys
 import math
 import random
+import subprocess
+import os
 
 pygame.init()
 
@@ -14,6 +16,8 @@ GREEN = (0, 180, 0)
 RED = (200, 0, 0)
 YELLOW = (255, 215, 0)
 STEEL = (160, 160, 170)
+BLUE = (0, 0, 255)
+HOVER_COLOR = (0, 0, 200)
 
 # Tela
 WIDTH, HEIGHT = 600, 800
@@ -359,6 +363,9 @@ def desenhar_tela(highlight_botao=None):
         txt = font.render(str(i), True, BLACK)
         screen.blit(txt, (botao.centerx - txt.get_width() // 2, botao.centery - txt.get_height() // 2))
     
+    # Desenhar botão de voltar
+    desenhar_botao_voltar()
+    
     # Mensagens com efeito de digitação
     if mensagem:
         status_texto = f"{mensagem} - {'Portas Abertas' if portas_abertas else 'Portas Fechadas'}"
@@ -375,6 +382,21 @@ def desenhar_tela(highlight_botao=None):
     desenhar_particulas()
     
     pygame.display.flip()
+
+# Desenhar botão de voltar ao menu
+def desenhar_botao_voltar():
+    mouse_pos = pygame.mouse.get_pos()
+    botao_voltar = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 60, 200, 40)
+
+    if botao_voltar.collidepoint(mouse_pos):
+        pygame.draw.rect(screen, HOVER_COLOR, botao_voltar, border_radius=10)
+    else:
+        pygame.draw.rect(screen, BLUE, botao_voltar, border_radius=10)
+
+    texto_voltar = font.render("Voltar ao Menu", True, WHITE)
+    screen.blit(texto_voltar, (botao_voltar.centerx - texto_voltar.get_width() // 2, botao_voltar.centery - texto_voltar.get_height() // 2))
+
+    return botao_voltar
 
 # Animação das portas com física
 def abrir_portas():
@@ -575,6 +597,8 @@ while rodando:
     delta_time = tempo_atual - ultimo_tempo
     ultimo_tempo = tempo_atual
     
+    botao_voltar = desenhar_botao_voltar()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             rodando = False
@@ -585,6 +609,10 @@ while rodando:
                 if botao.collidepoint(x, y) and not em_movimento:
                     efeito_botao(i)
                     mover_para(i)
+            if botao_voltar.collidepoint(event.pos):
+                pygame.quit()
+                subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "Menu.py")])
+                sys.exit()
         elif event.type == pygame.MOUSEMOTION:
             mx, my = event.pos
             for i in range(NUM_ANDARES):

@@ -126,24 +126,16 @@ def desenhar_menu():
 def executar_case1():
     script_path = os.path.join(os.path.dirname(__file__), "MaquinaDeDoces.py")
     if os.path.exists(script_path):
-        pygame.quit()  # Fecha o Pygame antes de executar o subprocesso
-        try:
-            subprocess.run([sys.executable, script_path], check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Erro ao executar Case 1: {e}")
-    else:
-        print("Arquivo 'MaquinaDeDoces.py' não encontrado.")
+        pygame.quit()
+        subprocess.run([sys.executable, script_path])
+        pygame.init()  # Reinitialize pygame after returning
 
 def executar_case2():
     script_path = os.path.join(os.path.dirname(__file__), "Elevador.py")
     if os.path.exists(script_path):
-        pygame.quit()  # Fecha o Pygame antes de executar o subprocesso
-        try:
-            subprocess.run([sys.executable, script_path], check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Erro ao executar Case 2: {e}")
-    else:
-        print("Arquivo 'Elevador.py' não encontrado.")
+        pygame.quit()
+        subprocess.run([sys.executable, script_path])
+        pygame.init()  # Reinitialize pygame after returning
 
 # Loop do menu
 rodando = True

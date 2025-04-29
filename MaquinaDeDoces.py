@@ -1,5 +1,7 @@
 import pygame
 import sys
+import os
+import subprocess
 
 # Inicializa o Pygame
 pygame.init()
@@ -11,6 +13,8 @@ LIGHT_BLUE = (173, 216, 230)
 GREEN = (0, 200, 0)
 RED = (200, 0, 0)
 GRAY = (211, 211, 211)
+BLUE = (0, 0, 255)
+HOVER_COLOR = (100, 100, 255)
 
 # Tela
 WIDTH, HEIGHT = 800, 600
@@ -52,6 +56,7 @@ def desenhar_texto(texto, x, y, cor=BLACK):
 def desenhar_tela():
     screen.fill(WHITE)
 
+    # Título
     titulo = large_font.render("Máquina de Doces", True, BLACK)
     screen.blit(titulo, (WIDTH // 2 - titulo.get_width() // 2, 20))
 
@@ -82,13 +87,33 @@ def desenhar_tela():
         desenhar_texto("Doce Entregue:", 400, 250)
         screen.blit(doce_img, (400, 280))
 
+    # Desenhar botão de voltar
+    desenhar_botao_voltar()
+
     pygame.display.flip()
+
+# Adicionando o botão de voltar ao menu
+def desenhar_botao_voltar():
+    mouse_pos = pygame.mouse.get_pos()
+    botao_voltar = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 60, 200, 40)
+
+    if botao_voltar.collidepoint(mouse_pos):
+        pygame.draw.rect(screen, HOVER_COLOR, botao_voltar, border_radius=10)
+    else:
+        pygame.draw.rect(screen, BLUE, botao_voltar, border_radius=10)
+
+    texto_voltar = font.render("Voltar ao Menu", True, WHITE)
+    screen.blit(texto_voltar, (botao_voltar.centerx - texto_voltar.get_width() // 2, botao_voltar.centery - texto_voltar.get_height() // 2))
+
+    return botao_voltar
 
 # Loop principal
 rodando = True
 clock = pygame.time.Clock()
 
 while rodando:
+    botao_voltar = desenhar_botao_voltar()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             rodando = False
@@ -101,10 +126,7 @@ while rodando:
                 saldo += 2
                 mensagem = "R$2 inserido."
             elif botao_5.collidepoint(event.pos):
-                if isinstance(saldo, int) and saldo >= 0:
-                    saldo += 5
-                else:
-                    mensagem = "Erro: saldo inválido."
+                saldo += 5
                 mensagem = "R$5 inserido."
             elif botao_a.collidepoint(event.pos):
                 if saldo >= precos["A"]:
@@ -130,6 +152,11 @@ while rodando:
                     saldo = 0
                 else:
                     mensagem = "Erro: saldo insuficiente para Doce C."
+            # Verifica se o botão de voltar foi clicado
+            elif botao_voltar.collidepoint(event.pos):
+                pygame.quit()
+                subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), "Menu.py")])
+                sys.exit()
 
     desenhar_tela()
     clock.tick(30)
